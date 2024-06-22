@@ -1,0 +1,124 @@
+     1                                  
+     2                                  ; Program Description: fast array summation faster than what C++ can provide, 
+     3                                  ;					 	so i call assembly functions
+     4                                  
+     5                                  ; Author: 				austin lew
+     6                                  
+     7                                  ; Creation Date: 		10/17/19
+     8                                  
+     9                                  ; Revisions: 
+    10                                  
+    11                                  ; Date: 10/17/19             Modified by:
+    12                                  
+    13                                  ; Operating System: linux mint
+    14                                  
+    15                                  ; IDE/Compiler: g++
+    16                                  
+    17                                  SECTION .data
+    18                                  
+    19                                  ;Include file for the functions library
+    20                                  ;
+    21                                  sys_exit	equ	1h
+    22                                  sys_read	equ	3h
+    23                                  sys_write	equ	4h
+    24                                  stdin		equ	0h
+    25                                  stdout		equ	1h
+    26                                  stderr		equ	3h
+    27                                  
+    28                                  SECTION .bss
+    29                                  SECTION .text
+    30                                  
+    31                                  global addTwo
+    32                                  global multiplyTwo
+    33                                  global pow2
+    34                                  global addArray
+    35                                  global revArray
+    36                                  global addTwoArrays
+    37                                  
+    38                                  
+    39                                  addTwo:
+    40 00000000 90                      	nop 							;
+    41 00000001 8B442404                	mov eax, [esp+4]				;move first argument into eax
+    42 00000005 8B542408                	mov edx, [esp+8]				;move second argument into edx
+    43 00000009 01D0                    	add eax, edx 					;add edx into eax
+    44 0000000B C3                      	ret 							;return eax
+    45                                  
+    46                                  multiplyTwo:
+    47 0000000C 90                      	nop 							;
+    48 0000000D 8B442404                	mov eax, [esp+4] 				;move first argument into eax
+    49 00000011 8B542408                	mov edx, [esp+8] 				;move seconde argument into edx
+    50 00000015 F7E2                    	mul edx							;multiply edx into eax
+    51 00000017 C3                      	ret 							;return eax
+    52                                  
+    53                                  pow2:
+    54 00000018 90                      	nop 							;
+    55 00000019 8B442404                	mov eax, [esp+4] 	 			;move first argument into eax
+    56 0000001D F7E0                    	mul eax 						;multiply eax by itself
+    57 0000001F C3                      	ret 							;return eax
+    58                                  
+    59                                  
+    60                                  addArray:
+    61 00000020 8B742404                 	mov esi, [esp+4] 				;move address of first array into esi
+    62 00000024 8B4C2408                 	mov ecx, [esp+8] 				;move size of array into ecx
+    63 00000028 BF00000000               	mov edi, 0						;clear edi
+    64 0000002D B800000000               	mov eax, 0 						;clear eax
+    65                                   	Loop1:  						;loop1 
+    66 00000032 03043E                   		add eax, [esi+edi] 			;move contents of array1 into eax
+    67 00000035 83C704                   		add edi, 4  				;increment edi by double word
+    68 00000038 E2F8                     	loop Loop1						;end of loop1
+    69 0000003A C3                       	ret
+    70                                  
+    71                                  revArray:
+    72 0000003B 8B742404                	mov esi, [esp+4] 				;address of array1 into esi
+    73 0000003F 8B7C2408                	mov edi, [esp+8]				;address of array2 into edi
+    74 00000043 8B4C240C                	mov ecx, [esp+12]				;put size into ecx
+    75 00000047 BA00000000              	mov edx, 0						;clear edx
+    76 0000004C B800000000              	mov eax, 0						;clear eax
+    77                                  	Loop2:							;loop2
+    78 00000051 8B448EFC                		mov eax, [esi+(ecx-1)*4]	;store value of array1 into eax
+    79 00000055 890417                  		mov [edi+edx], eax 			;store eax into array2
+    80 00000058 83C204                  		add edx, 4 					;increment edx by double word
+    81 0000005B E2F4                    	loop Loop2						;end of loop2 
+    82 0000005D C3                      	ret
+    83                                  	
+    84                                  
+    85                                  addTwoArrays: 	
+    86 0000005E 8B742404                	mov esi, [esp+4] 				;move address of first array into esi
+    87 00000062 8B7C2408                 	mov edi, [esp+8] 				;move address of second array into edi
+    88 00000066 8B44240C                 	mov eax, [esp+12] 				;move address of third array into eax
+    89 0000006A 8B4C2410                 	mov ecx, [esp+16] 				;move size of arrays into ecx
+    90 0000006E BA00000000               	mov edx, 0						;clear edx
+    91                                  
+    92                                   	; Loop2: 
+    93                                   	; 	mov ebx, [eax+edx]
+    94                                   	; 	add ebx, [esi+edx]
+    95                                   	; 	add ebx, [edi+edx]
+    96                                   	; 	mov [eax+edx], ebx
+    97                                   	; 	add edx, 4
+    98                                   	; loop Loop2
+    99                                  
+   100                                  
+   101                                   	; protoLoop2:
+   102                                   	; 	mov ebx, [esi+edx] 	;move value of array1 to ebx
+   103                                   	; 	add [edi+edx], ebx	;add value of arr1 into arr2
+   104                                   	; 	mov ebx, [edi+edx]	;move value of arr2 into ebx
+   105                                   	; 	mov [eax+edx], ebx 	;move ebx into array3
+   106                                   	; 	add edx, 4			;increment by double word
+   107                                   	; loop protoLoop2
+   108                                  
+   109                                   	; protoLoop3:
+   110                                   	; 	mov edx, [esi+(ecx-1)*4] 	;move value of array1 to ebx
+   111                                   	; 	add [edi+(ecx-1)*4], edx	;add value of arr1 into arr2
+   112                                   	; 	mov edx, [edi+(ecx-1)*4]	;move value of arr2 into ebx
+   113                                   	; 	mov [eax+(ecx-1)*4], edx 	;move ebx into array3
+   114                                   	; loop protoLoop3
+   115                                   	
+   116                                  
+   117                                  
+   118                                  	 Loop3:
+   119 00000073 8B548EFC                 		mov edx, [esi+(ecx-1)*4] 	;move value of array1 to edx
+   120 00000077 03548FFC                 		add edx, [edi+(ecx-1)*4] 	;add value of arr2 into edx
+   121 0000007B 895488FC                 		mov [eax+(ecx-1)*4], edx 	;move edx into array3
+   122 0000007F E2F2                     	loop Loop3
+   123                                  
+   124 00000081 C3                       	ret

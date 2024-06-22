@@ -1,0 +1,9 @@
+#!/bin/bash
+# 
+
+
+
+g++ $2.cpp -c -m32 -o $2.o
+g++ $2.o $1.o -m32 -o main
+#use
+#./buildCPP funcs main

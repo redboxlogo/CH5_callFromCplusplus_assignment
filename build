@@ -1,0 +1,23 @@
+#!/bin/bash
+# 
+
+rm *.o
+rm *.lst
+
+nasm -g -f elf32 $1.asm -l $1.lst
+
+
+
+
+#use
+#./build funcs
+
+
+
+#nasm -g -f elf32 funcs.asm -l funcs.lst
+#g++ main.cpp -c -m32 -o main.o
+#g++ main.o funcs.o -m32 -o main
+
+#use 
+#./build
+#to build the code
